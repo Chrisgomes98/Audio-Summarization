@@ -1,4 +1,4 @@
-This is the final year project of B.Tech(2018-2022 batch).
+This is our final year project of B.Tech (2018-2022).
 
 Topic: Audio Summarization
 
