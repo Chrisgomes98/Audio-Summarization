@@ -91,3 +91,11 @@ class gender_detector():
     def detect(self,feature_vector=[]):
         feature_vector=[feature_vector]
         return self.clf.predict(feature_vector)
+    
+class speech_detector():
+    def __init__(self):
+        pickle_in = open("speech_classifier.pickle","rb")
+        self.clf = pickle.load(pickle_in)
+    def detect(self,feature_vector=[]):
+        feature_vector=[feature_vector]
+        return self.clf.predict(feature_vector)

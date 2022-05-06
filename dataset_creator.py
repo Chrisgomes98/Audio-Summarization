@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import librosa, librosa.display #librosa is a python package for music and audio analysis. It provides the building blocks necessary to create music information retrieval systems.
+import audio_feature_extractor as afer
 
 class dataset_creator:
     def __init__(self,path,prefix,afe,label_classifier,label):
@@ -8,6 +9,7 @@ class dataset_creator:
         self.prefix=prefix
         self.afe=afe
         self.label_classifier=label_classifier
+        self.speech_classifier=afer.speech_detector()
         self.label=label
     def generate_dataset(self):
         dataset=pd.read_csv(self.path)
@@ -21,19 +23,21 @@ class dataset_creator:
             signal, sample_rate = librosa.load(name, sr=22050)#plot signal
             label=labels[j]
             df_feature_row={}
-            for i in range(signaln*2,len(signal),signaln):
+            for i in range(0,len(signal),signaln):
                 feature_row = self.afe.get_feature_row(signal[i:i+signaln],sample_rate)
                 f_row={}
                 for key in feature_row.keys():
                     f_row[key]=sum(feature_row[key][0])/len(feature_row[key][0])
-               
-                for key in f_row.keys():
-                    df[key].append(f_row[key])
-
-                if(self.label=="Defined"):
-                    df['Label'].append(label)
+                if(self.label!="Defined"):
+                    #to check if the audio's portion is speech or not    
+                    isSpeech = self.speech_classifier.detect(list(f_row.values()))
+                    if(isSpeech==np.array([1])):                     
+                        for key in f_row.keys():
+                            df[key].append(f_row[key])
+                        df['Label'].append(list(self.label_classifier.detect(list(f_row.values())))[0])
+                        
                 else:
-                    df['Label'].append(list(self.label_classifier.detect(list(f_row.values())))[0])
+                    df['Label'].append(label)       
 
                 self.afe.reset()
             df = pd.DataFrame(df)
