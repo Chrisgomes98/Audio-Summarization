@@ -34,9 +34,10 @@ class dataset_creator:
                     if(isSpeech==np.array([1])):                     
                         for key in f_row.keys():
                             df[key].append(f_row[key])
-                        df['Label'].append(list(self.label_classifier.detect(list(f_row.values())))[0])
-                        
+                        df['Label'].append(list(self.label_classifier.detect(list(f_row.values())))[0])  
                 else:
+                    for key in f_row.keys():
+                        df[key].append(f_row[key])
                     df['Label'].append(label)       
 
                 self.afe.reset()
